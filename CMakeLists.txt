@@ -42,4 +42,4 @@ link_directories(${TOOL_LIB_PATH})
 include_directories(include)
 
 add_subdirectory(bwio)
-add_subdirectory(src)
+add_subdirectory(kernel)
