@@ -17,17 +17,17 @@ bool scheduler_ring_buffer_empty(SchedulerRingBuffer *srb)
     return srb->num_elems == 0;
 }
 
-void scheduler_ring_buffer_elem_push(SchedulerRingBuffer *srb, unsigned char elem)
+void scheduler_ring_buffer_elem_push(SchedulerRingBuffer *srb, TaskDescriptor *task)
 {
     srb->num_elems++;
-    srb->elems[srb->tail_index++] = elem;
+    srb->elems[srb->tail_index++] = task;
     srb->tail_index &= (MAX_TASKS - 1);
 }
 
-uint8_t ring_buffer_elem_pop(SchedulerRingBuffer *srb)
+TaskDescriptor *scheduler_ring_buffer_elem_pop(SchedulerRingBuffer *srb)
 {
     srb->num_elems--;
-    uint8_t ret_elem = srb->elems[srb->head_index++];
+    TaskDescriptor *ret_task = srb->elems[srb->head_index++];
     srb->head_index &= (MAX_TASKS - 1);
-    return ret_elem;
+    return ret_task;
 }

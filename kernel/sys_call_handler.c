@@ -10,8 +10,8 @@ void handle_sys_call()
     // Move the params pointer onto the stack
     void *params = params_reg;
 
-    register uint32_t *lr asm("lr");
-    SysCallType sys_call = (*(lr - 1)) & 0xFFFFFF;
+    register uint32_t r7 asm("r7");
+    uint32_t sys_call = r7;
 
     switch (sys_call)
     {
@@ -24,9 +24,12 @@ void handle_sys_call()
     case SYSCALL_MYTID:
     case SYSCALL_PARENTTID:
     case SYSCALL_PASS:
+        return;
     case SYSCALL_EXIT:
+        active_running_task = NULL;
+        return;
     default:
-        bwprintf(COM2, "INVALID!!!\n");
+        bwprintf(COM2, "INVALID!!!\n\r");
         break;
     }
 }

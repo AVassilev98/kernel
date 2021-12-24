@@ -10,6 +10,7 @@ int Create(int priority, void (*code)())
     params.code = code;
     register SysCallCreateParams *p_params asm("r0") = &params;
     register int ret asm("r0");
+    register int id asm("r7") = SYSCALL_CREATE;
     asm("swi %[sys_call_id]" : "=r"(ret) : "0"(p_params), [ sys_call_id ] "I"(SYSCALL_CREATE));
     return ret;
 }
@@ -30,10 +31,12 @@ int MyParentTid()
 
 void Pass()
 {
+    register int id asm("r7") = SYSCALL_PASS;
     asm("swi %[sys_call_id]" : : [ sys_call_id ] "I"(SYSCALL_PASS));
 }
 
 void Exit()
 {
+    register int id asm("r7") = SYSCALL_EXIT;
     asm("swi %[sys_call_id]" : : [ sys_call_id ] "I"(SYSCALL_EXIT));
 }
