@@ -10,7 +10,8 @@ set(TOOL_LIB_EXEC ${CMAKE_CURRENT_SOURCE_DIR}/toolchain/gnuarm-4.0.2/libexec/gcc
 set(CMAKE_SKIP_RPATH TRUE)
 
 # remove -rdynamic option, breaks compilation
-set( CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "" )
+set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "src/")
 set(GCC_C_COMPILE_FLAGS -g -S -fPIC -Wall -mcpu=arm920t -msoft-float)
 set(GCC_ASM_COMPILE_FLAGS)
 set(GCC_LINK_FLAGS -static -nmagic -T ${CMAKE_CURRENT_SOURCE_DIR}/linker.ld)
