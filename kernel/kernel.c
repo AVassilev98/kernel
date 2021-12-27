@@ -6,42 +6,62 @@
 #include "ts7200.h"
 
 extern void swi_handler(int);
+extern void kernel_to_task(uint32_t *);
 
 void print_regs(uint32_t reg)
 {
     register uint32_t sp asm("sp");
-    bwprintf(COM1, "sp: %x \r\n", sp);
+    bwprintf(COM2, "sp: %x \r\n", sp);
 }
 
-void yield_task()
+void repeat_task()
 {
-    int i;
-    while (1)
+    int tid = MyTid();
+    int parent_tid = MyParentTid();
+    bwprintf(COM2, "Entering task, id %d, parent id: %d\r\n", tid, parent_tid);
+
+    while (true)
     {
-        bwprintf(COM1, "iteration: %d\r\n", i);
+        bwprintf(COM2, "In Task %d!\r\n", tid);
         Pass();
-        i++;
     }
+    Exit();
+}
+
+void init_task()
+{
+    int tid = MyTid();
+    int parent_tid = MyParentTid();
+    bwprintf(COM2, "Entering init task. id %d, parent id: %d\r\n", tid, parent_tid);
+    Create(10, repeat_task);
+    bwputstr(COM2, "Created first task\r\n");
+    Create(10, repeat_task);
+    bwputstr(COM2, "Created second task\r\n");
+    bwputstr(COM2, "Exiting init task\r\n");
     Exit();
 }
 
 void k_init()
 {
+    int *addr = (int *)0x28;
+    *addr = (uint32_t)&swi_handler;
+
+    bwsetfifo(COM2, OFF);
+    bwsetspeed(COM2, 115200);
+    bwsetfifo(COM1, OFF);
+    bwsetspeed(COM1, 115200);
     k_scheduler_init();
-    k_create(0, yield_task);
 }
 
 void k_run()
 {
-    int *addr = (int *)0x28;
-    *addr = (uint32_t)&swi_handler;
     k_init();
     kernel_to_task(active_running_task->stack_pointer);
+    bwputstr(COM2, "Hello!\r\n");
 }
 
 int _start()
 {
-    return 0;
     k_run();
     return 0;
 }

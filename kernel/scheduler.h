@@ -18,7 +18,8 @@ typedef enum State
 typedef struct TaskDescriptor
 {
     uint32_t *stack_pointer;
-    uint32_t t_id;
+    int t_id;
+    int parent_tid;
     State state;
     uint8_t priority;
     uint32_t stack[STACK_SIZE];
@@ -28,5 +29,6 @@ typedef struct TaskDescriptor
 extern TaskDescriptor *active_running_task;
 void k_scheduler_init();
 int k_create(int priority, void (*code)());
+void k_exit();
 uint32_t *k_schedule(uint32_t *old_sp);
 void init_task_descriptor(TaskDescriptor *task_descriptor);

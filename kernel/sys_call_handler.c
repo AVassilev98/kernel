@@ -4,32 +4,41 @@
 #include "sys_call_params.h"
 #include "ts7200.h"
 
-void handle_sys_call()
+int handle_sys_call()
 {
-    register void *params_reg asm("r0");
-    // Move the params pointer onto the stack
-    void *params = params_reg;
-
-    register uint32_t r7 asm("r7");
-    uint32_t sys_call = r7;
+    register SysCallType sys_call_reg asm("r7");
+    SysCallType sys_call = sys_call_reg;
 
     switch (sys_call)
     {
     case SYSCALL_CREATE:
     {
-        SysCallCreateParams *create_params = params;
-        k_create(create_params->priority, create_params->code);
-        break;
+        register int priority asm("r0");
+        register void (*code)() asm("r1");
+        k_create(priority, code);
+        return;
     }
     case SYSCALL_MYTID:
+    {
+        return active_running_task->t_id;
+    }
     case SYSCALL_PARENTTID:
+    {
+        return active_running_task->parent_tid;
+    }
     case SYSCALL_PASS:
+    {
         return;
+    }
     case SYSCALL_EXIT:
-        active_running_task = NULL;
+    {
+        k_exit();
         return;
+    }
     default:
-        bwprintf(COM2, "INVALID!!!\n\r");
-        break;
+    {
+        bwprintf(COM2, "Invalid Syscall\n\r");
+        return;
+    }
     }
 }

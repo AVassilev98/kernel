@@ -29,6 +29,8 @@ swi_handler:
 
     mrs     r12, cpsr
     stmfd   sp!, {r1-r12, lr}
+    ldr     r7, [lr, #-4]
+    and     r7, r7, #0x00FFFFFF
     bl      handle_sys_call
     stmfd   sp!, {r0}
 
