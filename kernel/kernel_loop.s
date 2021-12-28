@@ -1,6 +1,16 @@
     .file	"kernel_loop.c"
     .text
     .align	2
+    .global	kernel_enter_loop
+    .type	kernel_enter_loop, %function
+kernel_enter_loop:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 1, uses_anonymous_args = 0
+
+	mov	ip, sp
+	stmfd	sp!, {fp, ip, lr, pc}
+	sub	fp, ip, #4
+
     .global	kernel_to_task
     .type	kernel_to_task, %function
 kernel_to_task:
@@ -43,6 +53,6 @@ swi_handler:
 
     .size	swi_handler, .-swi_handler
 kernel_to_redboot:
-    mov pc, lr
+	ldmfd	sp, {fp, sp, pc}
 
 	.ident	"GCC: (GNU) 4.0.2"

@@ -56,12 +56,12 @@ void k_init()
 void k_run()
 {
     k_init();
-    kernel_to_task(active_running_task->stack_pointer);
-    bwputstr(COM2, "Hello!\r\n");
+    kernel_enter_loop(active_running_task->stack_pointer);
 }
 
 int _start()
 {
     k_run();
+    bwputstr(COM2, "No more tasks to run. Exiting.\r\n");
     return 0;
 }
