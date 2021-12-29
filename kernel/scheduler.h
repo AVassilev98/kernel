@@ -31,4 +31,3 @@ void k_scheduler_init();
 int k_create(int priority, void (*code)());
 void k_exit();
 uint32_t *k_schedule(uint32_t *old_sp);
-void init_task_descriptor(TaskDescriptor *task_descriptor);

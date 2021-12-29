@@ -13,7 +13,7 @@ TaskDescriptor *active_running_task;
 
 #define USER_MODE 0x50
 extern void Exit();
-void k_init_task_descriptor(TaskDescriptor *task_descriptor, void (*code)(), uint8_t priority)
+static inline void k_init_task_descriptor(TaskDescriptor *task_descriptor, void (*code)(), uint8_t priority)
 {
     int i;
     task_descriptor->t_id = t_id_counter++;
