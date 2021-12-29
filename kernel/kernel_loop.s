@@ -7,9 +7,7 @@ kernel_enter_loop:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 1, uses_anonymous_args = 0
 
-	mov	ip, sp
-	stmfd	sp!, {fp, ip, lr, pc}
-	sub	fp, ip, #4
+	stmfd	sp!, {r4-r12, lr}
 
     .global	kernel_to_task
     .type	kernel_to_task, %function
@@ -17,11 +15,14 @@ kernel_to_task:
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 1, uses_anonymous_args = 0
 
+    ldmfd   r0!, {r4, lr}
+    msr     spsr, r4
+
     msr  	cpsr_c, #0xdf
     mov	    sp, r0
     ldmfd	sp!, {r0-r12, lr}
+
     msr  	cpsr_c, #0xd3
-    msr     cpsr, r12
     movs	pc, lr
 
     .size	kernel_to_task, .-kernel_to_task
@@ -33,19 +34,17 @@ swi_handler:
 	@ frame_needed = 1, uses_anonymous_args = 0
 
 
-	mov     r12, lr
     msr     cpsr_c, #0xdf
-    mov     lr, r12
-
-    mrs     r12, cpsr
     stmfd   sp!, {r1-r12, lr}
-    ldr     r7, [lr, #-4]
-    and     r7, r7, #0x00FFFFFF
-    bl      handle_sys_call
-    stmfd   sp!, {r0}
-
-    mov     r0, sp
+    mov     r4, sp
+    
     msr     cpsr_c, #0xd3
+    mov     r6, lr
+    bl      handle_sys_call
+    stmfd   r4!, {r0}
+    mrs     r5, spsr
+    stmfd   r4!, {r5, r6}
+    mov     r0, r4
     bl      k_schedule
 
     cmp     r0, #0
@@ -53,6 +52,8 @@ swi_handler:
 
     .size	swi_handler, .-swi_handler
 kernel_to_redboot:
-	ldmfd	sp, {fp, sp, pc}
+
+	ldmfd	sp!, {r4-r12, lr}
+    bx lr
 
 	.ident	"GCC: (GNU) 4.0.2"

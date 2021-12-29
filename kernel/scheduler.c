@@ -11,18 +11,21 @@ static TaskDescriptor taskDescriptors[MAX_TASKS];
 TaskDescriptor *active_running_task;
 
 #define USER_MODE 0x50
+extern void Exit();
 void k_init_task_descriptor(TaskDescriptor *task_descriptor, void (*code)(), uint8_t priority)
 {
     int i;
     task_descriptor->t_id = t_id_counter++;
     task_descriptor->stack_pointer = task_descriptor->stack + STACK_SIZE;
 
-    *(--task_descriptor->stack_pointer) = (uint32_t)code;
-    *(--task_descriptor->stack_pointer) = USER_MODE;
-    for (i = 0; i < 12; i++)
+    *(--task_descriptor->stack_pointer) = (uint32_t)Exit;
+    for (i = 0; i < 13; i++)
     {
         *(--task_descriptor->stack_pointer) = 0;
     }
+
+    *(--task_descriptor->stack_pointer) = (uint32_t)code;
+    *(--task_descriptor->stack_pointer) = USER_MODE;
 
     task_descriptor->priority = priority;
     task_descriptor->state = INIT;
