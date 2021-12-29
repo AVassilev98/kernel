@@ -1,6 +1,7 @@
 add_executable(kernel
     scheduler.c
     scheduler_ring_buffer.c
+    task_table.c
     sys_call.c
     sys_call_handler.c
     kernel.c

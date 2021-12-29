@@ -2,10 +2,11 @@
 #include "common_defs.h"
 #include "scheduler.h"
 #include "scheduler_ring_buffer.h"
+#include "task_table.h"
 #include "ts7200.h"
 
 static int t_id_counter;
-static SchedulerRingBuffer readyTable[NUM_PRIORITY];
+static TaskTable ready_task_table;
 static SchedulerRingBuffer freeTaskDescriptors;
 static TaskDescriptor taskDescriptors[MAX_TASKS];
 TaskDescriptor *active_running_task;
@@ -35,10 +36,7 @@ extern void init_task();
 void k_scheduler_init()
 {
     int i;
-    for (i = 0; i < NUM_PRIORITY; i++)
-    {
-        scheduler_ring_buffer_init(&readyTable[i]);
-    }
+    task_table_init(&ready_task_table);
 
     scheduler_ring_buffer_init(&freeTaskDescriptors);
     for (i = 0; i < MAX_TASKS; i++)
@@ -68,8 +66,7 @@ int k_create(int priority, void (*code)())
     k_init_task_descriptor(task, code, priority);
     task->parent_tid = active_running_task->t_id;
 
-    SchedulerRingBuffer *srb = &readyTable[priority];
-    scheduler_ring_buffer_elem_push(srb, task);
+    task_table_elem_add(&ready_task_table, task);
     if (active_running_task == NULL)
     {
         active_running_task = task;
@@ -83,30 +80,13 @@ void k_exit()
     active_running_task = NULL;
 }
 
-TaskDescriptor *k_get_highest_priority()
-{
-    int i;
-    for (i = 0; i < NUM_PRIORITY; i++)
-    {
-        SchedulerRingBuffer *srb = &readyTable[MAX_PRIORITY - i];
-        if (!scheduler_ring_buffer_empty(srb))
-        {
-            return scheduler_ring_buffer_elem_pop(srb);
-        }
-    }
-    return NULL;
-}
-
 uint32_t *k_schedule(uint32_t *old_sp)
 {
     active_running_task->state = READY;
     active_running_task->stack_pointer = old_sp;
 
-    uint32_t priority = active_running_task->priority;
-    SchedulerRingBuffer *srb = &readyTable[priority];
+    active_running_task = task_table_elem_exchange(&ready_task_table, active_running_task);
 
-    scheduler_ring_buffer_elem_push(srb, active_running_task);
-    active_running_task = k_get_highest_priority();
     if (active_running_task == NULL)
     {
         bwputstr(COM2, "Got Null Task!\r\n");
