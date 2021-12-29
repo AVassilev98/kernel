@@ -67,10 +67,6 @@ int k_create(int priority, void (*code)())
     task->parent_tid = active_running_task->t_id;
 
     task_table_elem_add(&ready_task_table, task);
-    if (active_running_task == NULL)
-    {
-        active_running_task = task;
-    }
     return 0;
 }
 
