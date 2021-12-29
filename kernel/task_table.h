@@ -3,6 +3,7 @@
 
 typedef struct TaskTable
 {
+    uint32_t table_mask;
     SchedulerRingBuffer table[NUM_PRIORITY];
 } TaskTable;
 
