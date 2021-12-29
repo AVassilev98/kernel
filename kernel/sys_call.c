@@ -6,30 +6,35 @@
 int Create(int priority, void (*code)())
 {
     register int ret asm("r0");
-    asm("swi %[sys_call_id]" : "=r"(ret) : [ sys_call_id ] "I"(SYSCALL_CREATE));
+    asm("mov r8, %[sys_call_id]" ::[sys_call_id] "I"(SYSCALL_CREATE));
+    asm("swi 0");
     return ret;
 }
 
 int MyTid()
 {
     register int ret asm("r0");
-    asm("swi %[sys_call_id]" : "=r"(ret) : [ sys_call_id ] "I"(SYSCALL_MYTID));
+    asm("mov r8, %[sys_call_id]" ::[sys_call_id] "I"(SYSCALL_MYTID));
+    asm("swi 0");
     return ret;
 }
 
 int MyParentTid()
 {
     register int ret asm("r0");
-    asm("swi %[sys_call_id]" : "=r"(ret) : [ sys_call_id ] "I"(SYSCALL_PARENTTID));
+    asm("mov r8, %[sys_call_id]" ::[sys_call_id] "I"(SYSCALL_PARENTTID));
+    asm("swi 0");
     return ret;
 }
 
 void Pass()
 {
-    asm("swi %[sys_call_id]" : : [ sys_call_id ] "I"(SYSCALL_PASS));
+    asm("mov r8, %[sys_call_id]" ::[sys_call_id] "I"(SYSCALL_PASS));
+    asm("swi 0");
 }
 
 void Exit()
 {
-    asm("swi %[sys_call_id]" : : [ sys_call_id ] "I"(SYSCALL_EXIT));
+    asm("mov r8, %[sys_call_id]" ::[sys_call_id] "I"(SYSCALL_EXIT));
+    asm("swi 0");
 }

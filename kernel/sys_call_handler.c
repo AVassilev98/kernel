@@ -6,7 +6,7 @@
 
 int handle_sys_call()
 {
-    register SysCallType sys_call_reg asm("r7");
+    register SysCallType sys_call_reg asm("r8");
     SysCallType sys_call = sys_call_reg;
 
     switch (sys_call)
@@ -15,8 +15,7 @@ int handle_sys_call()
     {
         register int priority asm("r0");
         register void (*code)() asm("r1");
-        k_create(priority, code);
-        return;
+        return k_create(priority, code);
     }
     case SYSCALL_MYTID:
     {
