@@ -10,6 +10,6 @@ target_compile_options(kernel PRIVATE
 )
 
 target_link_libraries(kernel
-    bwio
+    ts7200
     gcc
 )

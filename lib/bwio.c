@@ -5,7 +5,7 @@
  *
  */
 
-#include "bwio/bwio.h"
+#include "bwio.h"
 #include "ts7200.h"
 
 /*

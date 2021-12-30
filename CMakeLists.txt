@@ -42,5 +42,5 @@ set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> <LINK_FLAGS> ${GCC_LINK_FLAGS} <OBJE
 link_directories(${TOOL_LIB_PATH})
 include_directories(include)
 
-add_subdirectory(bwio)
+add_subdirectory(lib)
 add_subdirectory(kernel)

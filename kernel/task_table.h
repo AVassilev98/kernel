@@ -1,5 +1,5 @@
 #pragma once
-#include "bwio/bwio.h"
+#include "bwio.h"
 #include "scheduler_ring_buffer.h"
 #include "ts7200.h"
 

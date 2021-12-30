@@ -1,4 +1,4 @@
-#include "bwio/bwio.h"
+#include "bwio.h"
 #include "sys_call.h"
 #include "sys_call_params.h"
 #include "ts7200.h"

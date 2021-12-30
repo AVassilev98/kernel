@@ -1,4 +1,4 @@
-#include "bwio/bwio.h"
+#include "bwio.h"
 #include "common_defs.h"
 #include "scheduler.h"
 #include "sys_call_params.h"
