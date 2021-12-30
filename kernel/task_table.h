@@ -21,7 +21,7 @@ static void task_table_elem_add(TaskTable *tt, TaskDescriptor *td) __attribute__
 #define TABLE_MASK_INIT(mask) (mask = 1 << 31)
 #define TABLE_EMPTY(mask) (mask == 1 << 31)
 
-static void task_table_init(TaskTable *tt)
+static inline void task_table_init(TaskTable *tt)
 {
     uint32_t i;
     for (i = 0; i < MAX_TASKS; i++)
@@ -31,7 +31,7 @@ static void task_table_init(TaskTable *tt)
     TABLE_MASK_INIT(tt->table_mask);
 }
 
-static TaskDescriptor *task_table_elem_exchange(TaskTable *tt, TaskDescriptor *td)
+static inline TaskDescriptor *task_table_elem_exchange(TaskTable *tt, TaskDescriptor *td)
 {
     static const int MultiplyDeBruijnBitPosition2[32] = {15, 14, 28, 13, 29, 1,  24, 12, 30, 22, 20, 0, 25, 17, 11, 7,
                                                          31, 27, 2,  23, 21, 19, 16, 8,  26, 3,  18, 9, 4,  10, 5,  6};
@@ -69,7 +69,7 @@ static TaskDescriptor *task_table_elem_exchange(TaskTable *tt, TaskDescriptor *t
     return ret;
 }
 
-static void task_table_elem_add(TaskTable *tt, TaskDescriptor *td)
+static inline void task_table_elem_add(TaskTable *tt, TaskDescriptor *td)
 {
     SchedulerRingBuffer *srb = &tt->table[td->priority];
     scheduler_ring_buffer_elem_push(srb, td);

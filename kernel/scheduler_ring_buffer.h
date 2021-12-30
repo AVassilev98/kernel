@@ -21,7 +21,7 @@ static TaskDescriptor *scheduler_ring_buffer_elem_pop(SchedulerRingBuffer *srb) 
 
 /*############ DEFINITIONS ################*/
 
-static void scheduler_ring_buffer_init(SchedulerRingBuffer *srb)
+static inline void scheduler_ring_buffer_init(SchedulerRingBuffer *srb)
 {
     srb->num_elems = 0;
     srb->head_index = 0;
@@ -45,7 +45,7 @@ static inline void scheduler_ring_buffer_elem_push(SchedulerRingBuffer *srb, Tas
     srb->tail_index &= (MAX_TASKS - 1);
 }
 
-static TaskDescriptor *scheduler_ring_buffer_elem_pop(SchedulerRingBuffer *srb)
+static inline TaskDescriptor *scheduler_ring_buffer_elem_pop(SchedulerRingBuffer *srb)
 {
     srb->num_elems--;
     TaskDescriptor *ret_task = srb->elems[srb->head_index++];
