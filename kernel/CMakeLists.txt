@@ -13,3 +13,10 @@ target_link_libraries(kernel
     ts7200
     gcc
 )
+
+if(WORKSPACE STREQUAL "Local")
+    add_custom_target(upload ALL
+        COMMAND sudo cp ${CMAKE_CURRENT_BINARY_DIR}/kernel /srv/tftp/kernel
+        DEPENDS kernel
+    )
+endif()

@@ -16,7 +16,24 @@ set(GCC_C_COMPILE_FLAGS -O2 -S -fPIC -Wall -mcpu=arm920t -msoft-float)
 set(GCC_ASM_COMPILE_FLAGS)
 set(GCC_LINK_FLAGS "-static -e main -nmagic -T ${CMAKE_CURRENT_SOURCE_DIR}/linker.ld")
 
-set(CMAKE_ASM_COMPILE_OBJECT "<CMAKE_ASM_COMPILER> <DEFINES> <INCLUDES> ${GCC_ASM_COMPILE_FLAGS} -o <OBJECT> <SOURCE>")
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    add_compile_definitions(Debug)
+else()
+    add_compile_definitions(Release)
+endif()
+
+if(NOT TS7200_TARGET_TYPE)
+    message(SEND_ERROR "must specify TS7200_TARGET_TYPE. Can be one of: {Physical, Emulator}")
+endif()
+if(NOT WORKSPACE)
+    message(SEND_ERROR "must specify WORKSPACE. Can be one of: {Local, Remote}")
+endif()
+
+if(${TS7200_TARGET_TYPE} STREQUAL "Emulator")
+    add_compile_definitions(Emulator)
+endif()
+
+set(CMAKE_ASM_COMPILE_OBJECT "<CMAKE_ASM_COMPILER> <INCLUDES> ${GCC_ASM_COMPILE_FLAGS} -o <OBJECT> <SOURCE>")
 string(
     REPLACE 
         "<ASSEMBLY_SOURCE>" "<OBJECT>.S" 
