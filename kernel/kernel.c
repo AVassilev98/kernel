@@ -59,7 +59,7 @@ void k_run()
     kernel_enter_loop(active_running_task->stack_pointer);
 }
 
-int _start()
+int main()
 {
     k_run();
     bwputstr(COM2, "No more tasks to run. Exiting.\r\n");
