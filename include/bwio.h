@@ -36,3 +36,14 @@ int bwputr(int channel, unsigned int reg);
 void bwputw(int channel, int n, char fc, char *bf);
 
 void bwprintf(int channel, char *format, ...);
+
+// clang-format off
+#ifdef Debug
+    #ifdef Emulator
+        #define dbgln(...) bwprintf(COM2, __VA_ARGS__);
+    #else
+        #define dbgln(...) bwprintf(COM1, __VA_ARGS__);
+    #endif
+#else
+    #define dbgln(...)
+#endif

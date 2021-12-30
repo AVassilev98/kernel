@@ -85,7 +85,7 @@ uint32_t *k_schedule(uint32_t *old_sp)
 
     if (active_running_task == NULL)
     {
-        bwputstr(COM2, "Got Null Task!\r\n");
+        dbgln("Got Null Task!\r\n", active_running_task);
         return NULL;
     }
 

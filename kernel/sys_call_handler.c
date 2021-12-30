@@ -36,7 +36,7 @@ int handle_sys_call()
     }
     default:
     {
-        bwprintf(COM2, "Invalid Syscall\n\r");
+        dbgln("Invalid Syscall\n\r");
         return;
     }
     }

@@ -11,20 +11,21 @@ extern void kernel_to_task(uint32_t *);
 void print_regs(uint32_t reg)
 {
     register uint32_t sp asm("sp");
-    bwprintf(COM2, "sp: %x \r\n", sp);
+    dbgln("sp: %x \r\n", sp);
 }
 
 void repeat_task()
 {
     int tid = MyTid();
     int parent_tid = MyParentTid();
-    bwprintf(COM2, "Entering task, id %d, parent id: %d\r\n", tid, parent_tid);
+    dbgln("Entering task, id %d, parent id: %d\r\n", tid, parent_tid);
 
     while (true)
     {
         bwprintf(COM2, "In Task %d!\r\n", tid);
         Pass();
     }
+    dbgln("In Task %d!\r\n", tid);
     Exit();
 }
 
@@ -32,12 +33,12 @@ void init_task()
 {
     int tid = MyTid();
     int parent_tid = MyParentTid();
-    bwprintf(COM2, "Entering init task. id %d, parent id: %d\r\n", tid, parent_tid);
+    dbgln("Entering init task. id %d, parent id: %d\r\n", tid, parent_tid);
     Create(10, repeat_task);
-    bwputstr(COM2, "Created first task\r\n");
+    dbgln("Created first task\r\n");
     Create(10, repeat_task);
-    bwputstr(COM2, "Created second task\r\n");
-    bwputstr(COM2, "Exiting init task\r\n");
+    dbgln("Created second task\r\n");
+    dbgln("Exiting init task\r\n");
     Exit();
 }
 
@@ -62,6 +63,6 @@ void k_run()
 int main()
 {
     k_run();
-    bwputstr(COM2, "No more tasks to run. Exiting.\r\n");
+    dbgln("No more tasks to run. Exiting.\r\n");
     return 0;
 }

@@ -74,5 +74,5 @@ static inline void task_table_elem_add(TaskTable *tt, TaskDescriptor *td)
     SchedulerRingBuffer *srb = &tt->table[td->priority];
     scheduler_ring_buffer_elem_push(srb, td);
     tt->table_mask |= ROW_TO_MASK(td->priority);
-    bwprintf(COM2, "tt->table_mask: %x\r\n", tt->table_mask);
+    dbgln("tt->table_mask: %x\r\n", tt->table_mask);
 }
