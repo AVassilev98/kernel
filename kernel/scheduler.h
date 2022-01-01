@@ -18,7 +18,7 @@ typedef enum State
 typedef struct TaskDescriptor
 {
     uint32_t *stack_pointer;
-    int t_id;
+    int tid;
     int parent_tid;
     State state;
     uint8_t priority;

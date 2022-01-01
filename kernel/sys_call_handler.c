@@ -19,7 +19,7 @@ int handle_sys_call()
     }
     case SYSCALL_MYTID:
     {
-        return active_running_task->t_id;
+        return active_running_task->tid;
     }
     case SYSCALL_PARENTTID:
     {

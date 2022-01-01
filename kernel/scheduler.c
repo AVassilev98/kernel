@@ -5,10 +5,10 @@
 #include "task_table.h"
 #include "ts7200.h"
 
-static int t_id_counter;
+static int tid_counter;
 static TaskTable ready_task_table;
 static SchedulerRingBuffer freeTaskDescriptors;
-static TaskDescriptor taskDescriptors[MAX_TASKS];
+TaskDescriptor taskDescriptors[MAX_TASKS];
 TaskDescriptor *active_running_task;
 
 #define USER_MODE 0x50
@@ -16,7 +16,7 @@ extern void Exit();
 static inline void k_init_task_descriptor(TaskDescriptor *task_descriptor, void (*code)(), uint8_t priority)
 {
     int i;
-    task_descriptor->t_id = t_id_counter++;
+    task_descriptor->tid = tid_counter++;
     task_descriptor->stack_pointer = task_descriptor->stack + STACK_SIZE;
 
     *(--task_descriptor->stack_pointer) = (uint32_t)Exit;
@@ -43,7 +43,7 @@ void k_scheduler_init()
     {
         scheduler_ring_buffer_elem_push(&freeTaskDescriptors, &taskDescriptors[i]);
     }
-    t_id_counter = 0;
+    tid_counter = 0;
 
     TaskDescriptor *first_user_task = scheduler_ring_buffer_elem_pop(&freeTaskDescriptors);
     k_init_task_descriptor(first_user_task, init_task, MAX_PRIORITY);
@@ -64,10 +64,10 @@ int k_create(int priority, void (*code)())
 
     TaskDescriptor *task = scheduler_ring_buffer_elem_pop(&freeTaskDescriptors);
     k_init_task_descriptor(task, code, priority);
-    task->parent_tid = active_running_task->t_id;
+    task->parent_tid = active_running_task->tid;
 
     task_table_elem_add(&ready_task_table, task);
-    return 0;
+    return task->tid;
 }
 
 void k_exit()
