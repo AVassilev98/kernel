@@ -1,6 +1,5 @@
 #include "bwio.h"
 #include "sys_call.h"
-#include "sys_call_params.h"
 #include "ts7200.h"
 
 int Create(int priority, void (*code)())

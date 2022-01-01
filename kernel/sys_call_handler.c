@@ -1,7 +1,7 @@
 #include "bwio.h"
 #include "common_defs.h"
 #include "scheduler.h"
-#include "sys_call_params.h"
+#include "sys_call.h"
 #include "ts7200.h"
 
 int handle_sys_call()
