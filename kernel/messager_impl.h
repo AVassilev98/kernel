@@ -9,11 +9,6 @@ extern TaskDescriptor taskDescriptors[MAX_TASKS];
 SchedulerRingBuffer mailboxes[MAX_TASKS];
 extern TaskTable ready_task_table;
 
-inline void k_block()
-{
-    active_running_task->state = BLOCKED;
-}
-
 inline void k_unblock(TaskDescriptor *td, int ret_val)
 {
     td->state = READY;
@@ -23,8 +18,8 @@ inline void k_unblock(TaskDescriptor *td, int ret_val)
 
 inline void mem_cpy(uint8_t *target, uint8_t *src, uint32_t len)
 {
-    int i;
-    for (i = 0; i < len; i++)
+    len >>= 2;
+    while (len--)
     {
         *target = *src;
         target++;
@@ -56,10 +51,10 @@ static int k_send_message(int tid, uint8_t *msg, int msglen, uint8_t *reply, int
 
     active_running_task->repl_len = replylen;
     active_running_task->repl_msg = reply;
-    k_block();
+    active_running_task->state |= RPL_BLOCKED;
 
     // receive before send
-    if (receiver->rcv_msg != NULL)
+    if (receiver->state & RCV_BLOCKED)
     {
         int len = msglen;
         int ret = msglen;
@@ -93,7 +88,7 @@ static int k_rcv_message(int *tid, uint8_t *msg, int msglen)
         active_running_task->rcv_tid = tid;
         active_running_task->rcv_msg = msg;
         active_running_task->rcv_msg_len = msglen;
-        k_block();
+        active_running_task->state |= RCV_BLOCKED;
         return 0;
     }
 
@@ -120,7 +115,7 @@ static int k_reply(int tid, uint8_t *reply, int rplen)
     {
         return -2;
     }
-    if (receiver->repl_msg == NULL)
+    if (!(receiver->state & RPL_BLOCKED))
     {
         return -3;
     }

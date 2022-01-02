@@ -8,12 +8,9 @@
 
 #define STACK_SIZE 1024 * 80
 
-typedef enum State
-{
-    READY,
-    BLOCKED,
-    DEAD
-} State;
+#define READY (1 << 0)
+#define RCV_BLOCKED (1 << 1)
+#define RPL_BLOCKED (1 << 2)
 
 typedef struct TaskDescriptor
 {
@@ -33,7 +30,7 @@ typedef struct TaskDescriptor
     int idx;
     int tid;
     int parent_tid;
-    State state;
+    uint32_t state;
     uint8_t priority;
 
     uint32_t stack[STACK_SIZE];

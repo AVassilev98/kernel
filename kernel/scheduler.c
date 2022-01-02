@@ -45,7 +45,7 @@ void k_scheduler_init()
     {
         taskDescriptors[i].idx = i;
         scheduler_ring_buffer_elem_push(&freeTaskDescriptors, &taskDescriptors[i]);
-        taskDescriptors[i].state = DEAD;
+        taskDescriptors[i].state &= ~READY;
     }
     tid_counter = 0;
 
@@ -76,7 +76,7 @@ int k_create(int priority, void (*code)())
 
 void k_exit()
 {
-    active_running_task->state = DEAD;
+    active_running_task->state &= ~READY;
     scheduler_ring_buffer_elem_push(&freeTaskDescriptors, active_running_task);
 }
 
