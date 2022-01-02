@@ -1,11 +1,12 @@
 #include "bwio.h"
 #include "common_defs.h"
 #include "messager.h"
+#include "messager_impl.h"
 #include "scheduler.h"
 #include "sys_call.h"
 #include "ts7200.h"
 
-int handle_sys_call(void *v0, void *v1, void *v2, void *v3)
+int handle_sys_call()
 {
     register SysCallType sys_call_reg asm("r8");
     volatile SysCallType sys_call = sys_call_reg;
@@ -14,7 +15,9 @@ int handle_sys_call(void *v0, void *v1, void *v2, void *v3)
     {
     case SYSCALL_CREATE:
     {
-        return k_create(v0, v1);
+        register int priority asm("r0");
+        register void (*code)() asm("r1");
+        return k_create(priority, code);
     }
     case SYSCALL_MYTID:
     {
@@ -35,17 +38,22 @@ int handle_sys_call(void *v0, void *v1, void *v2, void *v3)
     }
     case SYSCALL_SEND:
     {
-        register SendParams *params = v0;
+        register SendParams *params asm("r0");
         return k_send_message(params->tid, params->msg, params->msglen, params->reply, params->rplen);
     }
     case SYSCALL_RECV:
     {
-        int *tid = v0;
-        return k_rcv_message(v0, v1, v2);
+        register int *tid asm("r0");
+        register uint8_t *msg asm("r1");
+        register int msglen asm("r2");
+        return k_rcv_message(tid, msg, msglen);
     }
     case SYSCALL_REPLY:
     {
-        return k_reply(v0, v1, v2);
+        register int tid asm("r0");
+        register uint8_t *reply asm("r1");
+        register int rplen asm("r2");
+        return k_reply(tid, reply, rplen);
     }
     default:
     {
