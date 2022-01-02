@@ -1,25 +1,12 @@
 
 #pragma once
 #include "bwio.h"
-#include "message_ring_buffer.h"
 #include "scheduler.h"
 #include "task_table.h"
 
-typedef struct Mailbox
-{
-    int *rcv_tid;
-    uint8_t *rcv_msg;
-    int rcv_msg_len;
-
-    uint8_t *repl_msg;
-    int repl_len;
-
-    MessageRingBuffer rcv_buf;
-} Mailbox;
-
 extern TaskDescriptor *active_running_task;
 extern TaskDescriptor taskDescriptors[MAX_TASKS];
-MessageRingBuffer mailboxes[MAX_TASKS];
+SchedulerRingBuffer mailboxes[MAX_TASKS];
 extern TaskTable ready_task_table;
 
 inline void k_block()
@@ -31,7 +18,7 @@ inline void k_unblock(TaskDescriptor *td, int ret_val)
 {
     td->state = READY;
     task_table_elem_add(&ready_task_table, td);
-    // *(td->stack_pointer + 2) = ret_val;
+    *(td->stack_pointer + 2) = ret_val;
 }
 
 inline void mem_cpy(uint8_t *target, uint8_t *src, uint32_t len)
@@ -54,7 +41,7 @@ void k_messager_init()
         mb->rcv_msg = NULL;
         mb->repl_msg = NULL;
         mb->rcv_buf = &mailboxes[i];
-        message_ring_buffer_init(mb->rcv_buf);
+        scheduler_ring_buffer_init(mb->rcv_buf);
     }
 }
 
@@ -91,8 +78,9 @@ static int k_send_message(int tid, uint8_t *msg, int msglen, uint8_t *reply, int
     // send before receive
     else
     {
-        Message m = {msg, msglen, active_running_task->tid};
-        message_ring_buffer_elem_push(receiver->rcv_buf, m);
+        active_running_task->send_msg = msg;
+        active_running_task->send_msg_len = msglen;
+        scheduler_ring_buffer_elem_push(receiver->rcv_buf, active_running_task);
         return 0;
     }
 }
@@ -100,7 +88,7 @@ static int k_send_message(int tid, uint8_t *msg, int msglen, uint8_t *reply, int
 static int k_rcv_message(int *tid, uint8_t *msg, int msglen)
 {
     // Nobody to receieve from
-    if (message_ring_buffer_empty(active_running_task->rcv_buf))
+    if (scheduler_ring_buffer_empty(active_running_task->rcv_buf))
     {
         active_running_task->rcv_tid = tid;
         active_running_task->rcv_msg = msg;
@@ -110,18 +98,17 @@ static int k_rcv_message(int *tid, uint8_t *msg, int msglen)
     }
 
     // We can receive, no need to block
-    Message m;
-    message_ring_buffer_elem_pop(active_running_task->rcv_buf, &m);
-    int ret = m.len;
-    uint32_t len = m.len;
-    *tid = m.tid;
-    if (msglen < m.len)
+    TaskDescriptor *sender = scheduler_ring_buffer_elem_pop(active_running_task->rcv_buf);
+    int ret = sender->send_msg_len;
+    uint32_t len = sender->send_msg_len;
+    *tid = sender->tid;
+    if (msglen < len)
     {
         ret = -1;
         len = msglen;
     }
 
-    mem_cpy(msg, m.msg, len);
+    mem_cpy(msg, sender->send_msg, len);
     return ret;
 }
 

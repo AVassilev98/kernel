@@ -24,7 +24,10 @@ typedef struct TaskDescriptor
     uint8_t *repl_msg;
     int repl_len;
 
-    struct MessageRingBuffer *rcv_buf;
+    uint8_t *send_msg;
+    int send_msg_len;
+
+    struct SchedulerRingBuffer *rcv_buf;
 
     uint32_t *stack_pointer;
     int idx;
