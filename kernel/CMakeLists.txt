@@ -3,6 +3,7 @@ add_executable(kernel
     sys_call.c
     sys_call_handler.c
     kernel.c
+    messager.c
     kernel_loop.s
 )
 target_compile_options(kernel PRIVATE
