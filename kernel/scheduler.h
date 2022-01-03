@@ -40,7 +40,5 @@ typedef struct TaskDescriptor
 extern TaskDescriptor *active_running_task;
 void k_scheduler_init();
 int k_create(int priority, void (*code)());
-void k_block();
-void k_unblock(TaskDescriptor *td, int ret_val);
 void k_exit();
 uint32_t *k_schedule(uint32_t *old_sp);

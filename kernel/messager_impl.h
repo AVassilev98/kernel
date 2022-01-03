@@ -9,14 +9,14 @@ extern TaskDescriptor taskDescriptors[MAX_TASKS];
 SchedulerRingBuffer mailboxes[MAX_TASKS];
 extern TaskTable ready_task_table;
 
-inline void k_unblock(TaskDescriptor *td, int ret_val)
+static void __attribute__((always_inline)) k_unblock(TaskDescriptor *td, int ret_val)
 {
     td->state = READY;
     task_table_elem_add(&ready_task_table, td);
     *(td->stack_pointer + 2) = ret_val;
 }
 
-inline void mem_cpy(uint8_t *target, uint8_t *src, uint32_t len)
+static void __attribute__((always_inline)) mem_cpy(uint32_t *target, uint32_t *src, uint32_t len)
 {
     len >>= 2;
     while (len--)
@@ -40,7 +40,7 @@ void k_messager_init()
     }
 }
 
-static int k_send_message(int tid, uint8_t *msg, int msglen, uint8_t *reply, int replylen)
+static int __attribute__((always_inline)) k_send_message(int tid, uint8_t *msg, int msglen, uint8_t *reply, int replylen)
 {
     uint32_t receiver_idx = tid & 0xF;
     TaskDescriptor *receiver = &taskDescriptors[receiver_idx];
@@ -80,7 +80,7 @@ static int k_send_message(int tid, uint8_t *msg, int msglen, uint8_t *reply, int
     }
 }
 
-static int k_rcv_message(int *tid, uint8_t *msg, int msglen)
+static int __attribute__((always_inline)) k_rcv_message(int *tid, uint8_t *msg, int msglen)
 {
     // Nobody to receieve from
     if (scheduler_ring_buffer_empty(active_running_task->rcv_buf))
@@ -107,7 +107,7 @@ static int k_rcv_message(int *tid, uint8_t *msg, int msglen)
     return ret;
 }
 
-static int k_reply(int tid, uint8_t *reply, int rplen)
+static int __attribute__((always_inline)) k_reply(int tid, uint8_t *reply, int rplen)
 {
     uint32_t receiver_idx = tid & 0xF;
     TaskDescriptor *receiver = &taskDescriptors[receiver_idx];
