@@ -13,7 +13,7 @@ typedef struct TaskTable
 
 static void task_table_init(TaskTable *tt) __attribute__((always_inline));
 static TaskDescriptor *task_table_elem_exchange(TaskTable *tt, TaskDescriptor *td) __attribute__((always_inline));
-static inline void task_table_elem_add(TaskTable *tt, TaskDescriptor *td);
+static inline void task_table_elem_add(TaskTable *tt, TaskDescriptor *td) __attribute__((always_inline));
 extern const int MultiplyDeBruijnBitPosition2[32];
 
 /*############ DEFINITIONS ################*/
@@ -41,7 +41,7 @@ static inline TaskDescriptor *task_table_elem_exchange(TaskTable *tt, TaskDescri
     {
         uint32_t priority = td->priority;
         uint32_t active_mask = ROW_TO_MASK(priority);
-        if (active_mask < mask_lsb)
+        if (mask_lsb == 0 || active_mask < mask_lsb)
         {
             return td;
         }
