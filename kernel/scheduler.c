@@ -19,8 +19,16 @@ static inline void k_init_task_descriptor(TaskDescriptor *task_descriptor, void 
     int i;
     task_descriptor->tid = task_descriptor->idx + (tid_counter << 4);
     tid_counter++;
-    task_descriptor->stack_pointer = stacks[task_descriptor->idx] + STACK_SIZE;
 
+    task_descriptor->rcv_msg = NULL;
+    task_descriptor->rcv_msg_len = 0;
+    task_descriptor->rcv_tid = NULL;
+    task_descriptor->send_msg = NULL;
+    task_descriptor->send_msg_len = 0;
+    task_descriptor->repl_msg = NULL;
+    task_descriptor->repl_len = 0;
+
+    task_descriptor->stack_pointer = stacks[task_descriptor->idx] + STACK_SIZE;
     *(--task_descriptor->stack_pointer) = (uint32_t)Exit;
     for (i = 0; i < 13; i++)
     {
@@ -45,7 +53,7 @@ void k_scheduler_init()
     {
         taskDescriptors[i].idx = i;
         scheduler_ring_buffer_elem_push(&freeTaskDescriptors, &taskDescriptors[i]);
-        taskDescriptors[i].state &= ~READY;
+        taskDescriptors[i].state = 0;
     }
     tid_counter = 0;
 
