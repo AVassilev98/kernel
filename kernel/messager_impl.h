@@ -40,7 +40,7 @@ void k_messager_init()
     }
 }
 
-static int __attribute__((always_inline)) k_send_message(int tid, uint8_t *msg, int msglen, uint8_t *reply, int replylen)
+static int __attribute__((always_inline)) k_send_message(int tid, char *msg, int msglen, char *reply, int replylen)
 {
     uint32_t receiver_idx = tid & 0xF;
     TaskDescriptor *receiver = &taskDescriptors[receiver_idx];
@@ -64,7 +64,7 @@ static int __attribute__((always_inline)) k_send_message(int tid, uint8_t *msg, 
             len = receiver->rcv_msg_len;
         }
         *receiver->rcv_tid = active_running_task->tid;
-        mem_cpy(receiver->rcv_msg, msg, len);
+        mem_cpy((uint32_t *)receiver->rcv_msg, (uint32_t *)msg, len);
         receiver->rcv_msg = NULL;
         k_unblock(receiver, ret);
         return 0;
@@ -80,7 +80,7 @@ static int __attribute__((always_inline)) k_send_message(int tid, uint8_t *msg, 
     }
 }
 
-static int __attribute__((always_inline)) k_rcv_message(int *tid, uint8_t *msg, int msglen)
+static int __attribute__((always_inline)) k_rcv_message(int *tid, char *msg, int msglen)
 {
     // Nobody to receieve from
     if (scheduler_ring_buffer_empty(active_running_task->rcv_buf))
@@ -103,11 +103,11 @@ static int __attribute__((always_inline)) k_rcv_message(int *tid, uint8_t *msg, 
         len = msglen;
     }
 
-    mem_cpy(msg, sender->send_msg, len);
+    mem_cpy((uint32_t *)msg, (uint32_t *)sender->send_msg, len);
     return ret;
 }
 
-static int __attribute__((always_inline)) k_reply(int tid, uint8_t *reply, int rplen)
+static int __attribute__((always_inline)) k_reply(int tid, char *reply, int rplen)
 {
     uint32_t receiver_idx = tid & 0xF;
     TaskDescriptor *receiver = &taskDescriptors[receiver_idx];
@@ -128,7 +128,7 @@ static int __attribute__((always_inline)) k_reply(int tid, uint8_t *reply, int r
         len = receiver->repl_len;
     }
 
-    mem_cpy(receiver->repl_msg, reply, len);
+    mem_cpy((uint32_t *)receiver->repl_msg, (uint32_t *)reply, len);
     k_unblock(receiver, ret);
     return ret;
 }

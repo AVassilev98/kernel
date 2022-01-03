@@ -15,13 +15,13 @@
 typedef struct TaskDescriptor
 {
     int *rcv_tid;
-    uint8_t *rcv_msg;
+    char *rcv_msg;
     int rcv_msg_len;
 
-    uint8_t *repl_msg;
+    char *repl_msg;
     int repl_len;
 
-    uint8_t *send_msg;
+    char *send_msg;
     int send_msg_len;
 
     struct SchedulerRingBuffer *rcv_buf;

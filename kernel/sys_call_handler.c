@@ -27,12 +27,14 @@ int handle_sys_call()
     }
     case SYSCALL_PASS:
     {
-        return;
+        register int ret asm("r0");
+        return ret;
     }
     case SYSCALL_EXIT:
     {
         k_exit();
-        return;
+        register int ret asm("r0");
+        return ret;
     }
     case SYSCALL_SEND:
     {
@@ -42,21 +44,22 @@ int handle_sys_call()
     case SYSCALL_RECV:
     {
         register int *tid asm("r0");
-        register uint8_t *msg asm("r1");
+        register char *msg asm("r1");
         register int msglen asm("r2");
         return k_rcv_message(tid, msg, msglen);
     }
     case SYSCALL_REPLY:
     {
         register int tid asm("r0");
-        register uint8_t *reply asm("r1");
+        register char *reply asm("r1");
         register int rplen asm("r2");
         return k_reply(tid, reply, rplen);
     }
     default:
     {
         dbgln("Invalid Syscall\n\r");
-        return;
+        register int ret asm("r0");
+        return ret;
     }
     }
 }
