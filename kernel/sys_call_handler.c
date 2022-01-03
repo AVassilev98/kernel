@@ -8,9 +8,7 @@
 
 int handle_sys_call()
 {
-    register SysCallType sys_call_reg asm("r8");
-    volatile SysCallType sys_call = sys_call_reg;
-
+    register SysCallType sys_call asm("r8");
     switch (sys_call)
     {
     case SYSCALL_CREATE:

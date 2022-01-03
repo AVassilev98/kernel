@@ -40,6 +40,8 @@ swi_handler:
     
     msr     cpsr_c, #0xd3
     mov     r6, lr
+    ldr     r8, [lr, #-4]
+    and     r8, r8, #0x00FFFFFF
     bl      handle_sys_call
     stmfd   r4!, {r0}
     mrs     r5, spsr
