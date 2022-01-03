@@ -1,10 +1,10 @@
 #pragma once
 #include "common_defs.h"
 
-#define MAX_TASKS 16
+#define MAX_TASKS 32
 #define MIN_PRIORITY 0
-#define MAX_PRIORITY 15
-#define NUM_PRIORITY 16
+#define MAX_PRIORITY 31
+#define NUM_PRIORITY 32
 
 #define STACK_SIZE 1024 * 80
 
@@ -31,7 +31,7 @@ typedef struct TaskDescriptor
     int tid;
     int parent_tid;
     uint32_t state;
-    uint8_t priority;
+    uint32_t priority;
 
     uint32_t stack[STACK_SIZE];
 

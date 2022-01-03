@@ -18,9 +18,7 @@ extern const int MultiplyDeBruijnBitPosition2[32];
 
 /*############ DEFINITIONS ################*/
 
-#define ROW_TO_MASK(row) (0x8000 >> row)
-#define TABLE_MASK_INIT(mask) (mask = 1 << 31)
-#define TABLE_EMPTY(mask) (mask == 1 << 31)
+#define ROW_TO_MASK(row) ((unsigned)(1 << 31) >> row)
 
 static inline void task_table_init(TaskTable *tt)
 {
@@ -29,13 +27,13 @@ static inline void task_table_init(TaskTable *tt)
     {
         scheduler_ring_buffer_init(&tt->table[i]);
     }
-    TABLE_MASK_INIT(tt->table_mask);
+    tt->table_mask = 0;
 }
 
 static inline TaskDescriptor *task_table_elem_exchange(TaskTable *tt, TaskDescriptor *td)
 {
-    const int MultiplyDeBruijnBitPosition2[32] = {15, 14, 28, 13, 29, 1,  24, 12, 30, 22, 20, 0, 25, 17, 11, 7,
-                                                  31, 27, 2,  23, 21, 19, 16, 8,  26, 3,  18, 9, 4,  10, 5,  6};
+    const int MultiplyDeBruijnBitPosition2[32] = {31, 30, 3,  29, 2,  17, 7,  28, 1, 9,  11, 16, 6,  14, 27, 23,
+                                                  0,  4,  18, 8,  10, 12, 15, 24, 5, 19, 13, 25, 20, 26, 21, 22};
 
     uint32_t mask_lsb = (tt->table_mask) & (-tt->table_mask);
 
@@ -53,13 +51,12 @@ static inline TaskDescriptor *task_table_elem_exchange(TaskTable *tt, TaskDescri
         scheduler_ring_buffer_elem_push(srb, td);
     }
 
-    if (TABLE_EMPTY(tt->table_mask))
+    if (tt->table_mask == 0)
     {
         return NULL;
     }
 
     uint32_t new_task_priority = MultiplyDeBruijnBitPosition2[(uint32_t)(mask_lsb * 0x077CB531U) >> 27];
-
     SchedulerRingBuffer *srb = &tt->table[new_task_priority];
     TaskDescriptor *ret = scheduler_ring_buffer_elem_pop(srb);
 
