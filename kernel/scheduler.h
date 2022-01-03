@@ -3,8 +3,8 @@
 
 #define MAX_TASKS 32
 #define MIN_PRIORITY 0
-#define MAX_PRIORITY 31
-#define NUM_PRIORITY 32
+#define MAX_PRIORITY 30
+#define NUM_PRIORITY 31
 
 #define STACK_SIZE 1024 * 80
 

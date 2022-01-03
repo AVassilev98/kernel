@@ -18,7 +18,9 @@ extern const int MultiplyDeBruijnBitPosition2[32];
 
 /*############ DEFINITIONS ################*/
 
-#define ROW_TO_MASK(row) ((unsigned)(1 << 31) >> row)
+#define ROW_TO_MASK(row) ((1u << 31) >> row)
+#define TABLE_INIT() (1u << 31)
+#define TABLE_EMPTY(table) (table->table_mask == TABLE_INIT())
 
 static inline void task_table_init(TaskTable *tt)
 {
@@ -27,7 +29,7 @@ static inline void task_table_init(TaskTable *tt)
     {
         scheduler_ring_buffer_init(&tt->table[i]);
     }
-    tt->table_mask = 0;
+    tt->table_mask = TABLE_INIT();
 }
 
 static inline TaskDescriptor *task_table_elem_exchange(TaskTable *tt, TaskDescriptor *td)
@@ -41,7 +43,7 @@ static inline TaskDescriptor *task_table_elem_exchange(TaskTable *tt, TaskDescri
     {
         uint32_t priority = td->priority;
         uint32_t active_mask = ROW_TO_MASK(priority);
-        if (mask_lsb == 0 || active_mask < mask_lsb)
+        if (active_mask < mask_lsb)
         {
             return td;
         }
@@ -51,7 +53,7 @@ static inline TaskDescriptor *task_table_elem_exchange(TaskTable *tt, TaskDescri
         scheduler_ring_buffer_elem_push(srb, td);
     }
 
-    if (tt->table_mask == 0)
+    if (TABLE_EMPTY(tt))
     {
         return NULL;
     }
