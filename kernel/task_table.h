@@ -23,7 +23,7 @@ extern const int MultiplyDeBruijnBitPosition2[32];
 static inline void task_table_init(TaskTable *tt)
 {
     uint32_t i;
-    for (i = 0; i < MAX_TASKS; i++)
+    for (i = 0; i < NUM_PRIORITY; i++)
     {
         scheduler_ring_buffer_init(&tt->table[i]);
     }

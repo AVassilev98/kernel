@@ -32,9 +32,6 @@ typedef struct TaskDescriptor
     int parent_tid;
     uint32_t state;
     uint32_t priority;
-
-    uint32_t stack[STACK_SIZE];
-
 } TaskDescriptor;
 
 extern TaskDescriptor *active_running_task;
